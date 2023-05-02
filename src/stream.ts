@@ -1,10 +1,9 @@
 import type {
   StreamSpec,
-  RemoteStreamParamsResponse,
-  RemoteStreamHintsRequest,
-  RemoteStreamHintsResponse,
-  RemoteStreamOutputRequest,
-  RemoteStreamOutputResponse,
+  RemoteStreamParamsSchemaRequest,
+  RemoteStreamParamsSchemaResponse,
+  RemoteStreamEnumerateRequest,
+  RemoteStreamEnumerateResponse,
   RemoteStreamProcessRequest,
   RemoteStreamProcessResponse,
   RemoteStream,
@@ -29,48 +28,48 @@ export class Stream implements RemoteStream {
     this.spec = spec;
   }
   
-  public params(): RemoteStreamParamsResponse {
+  public async paramsSchema(
+    request: RemoteStreamParamsSchemaRequest,
+  ): Promise<RemoteStreamParamsSchemaResponse> {
     const params = this.spec.params;
     
     if (params) {
-      return {
-        schema: params.is.schema,
-        mandatory: params.mandatory,
-      };
+      if (params.type == 'static') {
+        const schema = params.is?.schema ?? null;
+        
+        return { schema };
+      } else {
+        const schema = await params.setup.schema(request.config);
+        
+        return { schema };
+      }
     } else {
       return { schema: null };
     }
   }
   
-  public async hints(request: RemoteStreamHintsRequest): Promise<RemoteStreamHintsResponse> {
-    const callback = this.spec.params?.hints;
+  public async enumerate(
+    request: RemoteStreamEnumerateRequest,
+  ): Promise<RemoteStreamEnumerateResponse> {
+    const callback = this.spec.enumerate;
     
     if (callback) {
-      const hints = await callback(request.param, request.partial);
+      const variants = await callback(request.config);
       
-      return { hints };
+      return { variants };
     } else {
-      return { hints: [] };
-    }
-  }
-  
-  public async output(request: RemoteStreamOutputRequest): Promise<RemoteStreamOutputResponse> {
-    const callback = this.spec.params?.output;
-    
-    if (callback) {
-      const schema = await callback(request.params);
-      
-      return { schema };
-    } else {
-      return { schema: null };
+      return { variants: [] };
     }
   }
   
   public async process(request: RemoteStreamProcessRequest): Promise<RemoteStreamProcessResponse> {
-    return await this.spec.process({
+    const result = await this.spec.process({
       now: new Date(request.now),
       state: request.state,
+      config: request.config,
       params: request.params,
     });
+    
+    return result;
   }
 }
