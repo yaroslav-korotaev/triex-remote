@@ -1,8 +1,11 @@
 import type {
+  FuncSpec,
   StreamSpec,
+  RemoteFunc,
   RemoteStream,
   RemoteIndexSpec,
 } from 'triex-types';
+import { Func } from './func';
 import { Stream } from './stream';
 
 export type IndexFactory<S, C> = (name: string, spec: S) => C;
@@ -45,9 +48,14 @@ export class Index<S, C> {
 }
 
 export class Remote {
+  public func: Index<FuncSpec, RemoteFunc>;
   public stream: Index<StreamSpec, RemoteStream>;
   
   constructor() {
+    this.func = new Index({
+      remote: this,
+      factory: (name, spec) => new Func({ name, spec }),
+    });
     this.stream = new Index({
       remote: this,
       factory: (name, spec) => new Stream({ name, spec }),
@@ -56,6 +64,7 @@ export class Remote {
   
   public index(): RemoteIndexSpec {
     return {
+      functions: this.func.list().map(func => func.name),
       streams: this.stream.list().map(stream => stream.name),
     };
   }
