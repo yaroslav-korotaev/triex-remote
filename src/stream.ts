@@ -34,15 +34,9 @@ export class Stream implements RemoteStream {
     const params = this.spec.params;
     
     if (params) {
-      if (params.type == 'static') {
-        const schema = params.is?.schema ?? null;
-        
-        return { schema };
-      } else {
-        const schema = await params.setup.schema(request.config);
-        
-        return { schema };
-      }
+      const schema = params.is?.schema ?? null;
+      
+      return { schema };
     } else {
       return { schema: null };
     }
