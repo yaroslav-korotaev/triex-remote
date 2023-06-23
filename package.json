@@ -14,7 +14,7 @@
   "repository": "yaroslav-korotaev/triex-remote",
   "scripts": {},
   "dependencies": {
-    "triex-types": "^0.4.0"
+    "triex-types": "^0.5.0"
   },
   "devDependencies": {
     "@types/node": "^18.7.3",

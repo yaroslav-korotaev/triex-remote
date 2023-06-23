@@ -48,7 +48,7 @@ export class Stream implements RemoteStream {
     const callback = this.spec.enumerate;
     
     if (callback) {
-      const variants = await callback(request.config);
+      const variants = await callback(request.resource);
       
       return { variants };
     } else {
@@ -59,8 +59,8 @@ export class Stream implements RemoteStream {
   public async process(request: RemoteStreamProcessRequest): Promise<RemoteStreamProcessResponse> {
     const result = await this.spec.process({
       now: new Date(request.now),
+      resource: request.resource,
       state: request.state,
-      config: request.config,
       params: request.params,
     });
     
