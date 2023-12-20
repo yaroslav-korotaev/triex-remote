@@ -78,8 +78,7 @@ export class Remote {
       blueprints: this.blueprint.list().map(blueprint => {
         return {
           name: blueprint.name,
-          resource: (blueprint.spec.resource) ? blueprint.spec.resource.schema : null,
-          command: (blueprint.spec.command) ? blueprint.spec.command.schema : null,
+          type: blueprint.spec.type,
         };
       }),
       blocks: this.block.list().map(block => {

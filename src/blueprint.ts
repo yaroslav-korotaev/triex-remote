@@ -1,7 +1,9 @@
 import type {
   BlueprintSpec,
-  RemoteBlueprintExecuteRequest,
-  RemoteBlueprintExecuteResponse,
+  RemoteBlueprintTransformRequest,
+  RemoteBlueprintTransformResponse,
+  RemoteBlueprintViewRequest,
+  RemoteBlueprintViewResponse,
   RemoteBlueprint,
 } from 'triex-types';
 
@@ -24,11 +26,23 @@ export class Blueprint implements RemoteBlueprint {
     this.spec = spec;
   }
   
-  public async execute(
-    request: RemoteBlueprintExecuteRequest,
-  ): Promise<RemoteBlueprintExecuteResponse> {
-    const resource = await this.spec.execute(request.resource, request.command);
+  public async transform(
+    request: RemoteBlueprintTransformRequest,
+  ): Promise<RemoteBlueprintTransformResponse> {
+    if (this.spec.type != 'external') {
+      throw new Error('not implemented');
+    }
     
-    return { resource };
+    return await this.spec.transform(request);
+  }
+  
+  public async view(
+    request: RemoteBlueprintViewRequest,
+  ): Promise<RemoteBlueprintViewResponse> {
+    if (this.spec.type != 'external') {
+      throw new Error('not implemented');
+    }
+    
+    return await this.spec.view(request);
   }
 }
