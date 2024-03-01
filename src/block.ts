@@ -49,6 +49,7 @@ export class Block implements RemoteBlock {
         next: (result.next) ? result.next.toISOString() : undefined,
         state: result.state,
         objects: result.objects,
+        metrics: result.metrics,
       },
     };
   }
